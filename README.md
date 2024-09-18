@@ -1,1 +1,2 @@
 # TheConsoleLottery
+Simple lottery game.
