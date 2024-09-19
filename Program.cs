@@ -3,31 +3,44 @@
     internal class Program
     {
         
-        static int buyTickets(ref int wallet, int price)
+        static int[] BuyTickets(ref int wallet, int price, ref int numberOfTickets)
         {
             while (true)
             {
             Console.WriteLine("Hur många lotter vill du köpa?");
             Console.WriteLine($"Du har {wallet}kr just nu");
             Console.WriteLine($"Lotterna kostar :{price} kr");
-            int.TryParse(Console.ReadLine(), out int lottNumber);
-                if (wallet - (lottNumber * price) < 0)
-                    Console.WriteLine("du har inte råd!");
-                else
+            int.TryParse(Console.ReadLine(), out numberOfTickets);
+                if (wallet - (numberOfTickets * price) < 0)
                 {
-                    wallet = wallet - (lottNumber * price);
-                    return lottNumber;                    
+                    Console.WriteLine("du har inte råd!");
+                    continue;
+                }
+                
+                int[] lottNumbers = new int[numberOfTickets];
+                for (int i = 0; i < numberOfTickets;) 
+                {
+                    Console.WriteLine("Ange ditt lott nummer 1-50");
+                    int.TryParse(Console.ReadLine(), out lottNumbers[i]);
+                    if (lottNumbers[i] > 0 && 51 > lottNumbers[i] )
+                        i++;
+
+                   else
+                        Console.WriteLine("Ange ett nummer mellan 1-50");
+                }
+
+               
+                if (numberOfTickets != 0)
+                {
+                    wallet = wallet - (numberOfTickets * price);
+                    return lottNumbers;                    
                 }
             }
         }
 
-        static int startGame(int numberOfTickets, int numberOfPulls, Random random, int winprize)
+        static int StartGame(int numberOfTickets, int numberOfPulls, Random random, int winprize, int[] lottNumbers)
         {
             int totalprize = 0;
-            int[] lottNumbers = new int[numberOfTickets];
-            for (int i = 0; i < numberOfTickets; i++)
-                lottNumbers[i] = random.Next(1, 51);
-
             Console.Clear();
             Console.WriteLine($"Du har {numberOfTickets} antal lotter");
             Console.Write("Dina lott nummer är: ");
@@ -44,10 +57,9 @@
                     if (lottNumbers[i] == winningNumbers[j])
                     {
                         Console.WriteLine($"Grattis du vann på nummer {lottNumbers[i]}");
-                        totalprize =+ winprize;
+                        totalprize += winprize;
                         winning = true;
-                        Console.WriteLine("Tryck enter för att återgå till huvudmenyn");
-                        Console.ReadLine();
+                        
                     }    
                 }
             if (winning == false)
@@ -60,9 +72,11 @@
                 Console.ReadLine();
 
             }
+            if (winning == true)
+                Console.WriteLine("Tryck Enter för att återgå till huvudmenyn");
             return totalprize;
         }
-        static void settings(ref int numberOfPulls,ref int price,ref int winprize)
+        static void Settings(ref int numberOfPulls,ref int price,ref int winprize)
         {
             bool settingsMenu = true;
             while(settingsMenu)
@@ -103,6 +117,7 @@
 
         static void Main(string[] args)
         {
+            int[] ticketArray = new int[5];
             Random random = new Random();
             int numberOfPulls = 3;
             int price = 10;
@@ -124,7 +139,7 @@
                 switch (menu)
                 { 
                 case 1:
-                numberOfTickets = buyTickets(ref wallet, price);
+                    ticketArray = BuyTickets(ref wallet, price, ref numberOfTickets);
                     break;
                 case 2:
                         if (numberOfTickets == 0)
@@ -134,11 +149,11 @@
                             Console.ReadLine();
                             break;
                         }
-                        wallet = startGame(numberOfTickets, numberOfPulls, random, winprize);
+                        wallet += StartGame(numberOfTickets, numberOfPulls, random, winprize, ticketArray);
                         numberOfTickets = 0;
                         break;
                 case 3:
-                        settings(ref numberOfPulls,ref price,ref winprize);
+                        Settings(ref numberOfPulls,ref price,ref winprize);
                     break;
                 case 4:
                         menyLoop = false;
